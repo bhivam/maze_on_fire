@@ -2,6 +2,7 @@ public class GridTile {
     int x;
     int y;
     boolean blocked;
+    boolean isBurning;
 
     // This is how the path from start to end node will be tracked
     GridTile prev;
