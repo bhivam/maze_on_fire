@@ -4,6 +4,6 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar"
     ],
-    "better-comments.multilineComments": true
-
+    "better-comments.multilineComments": true,
+    "better-comments.highlightPlainText": true,
 }

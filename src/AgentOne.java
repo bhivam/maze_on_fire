@@ -1,4 +1,4 @@
-import java.util.HashSet;
+import java.util.*;
 
 enum AgentState {
     BURNING,
@@ -21,8 +21,81 @@ public class AgentOne {
         createPath();
     }
 
+    public GridTile findPathBetween(int x1, int y1, int x2, int y2) {
+        LinkedHashSet<GridTile> fringe1 = new LinkedHashSet<GridTile>();
+        LinkedHashSet<GridTile> fringe2 = new LinkedHashSet<GridTile>();
+        HashSet<GridTile> closed_set = new HashSet<GridTile>();
+        GridTile current1;
+        GridTile current2;
+
+        GridTile[][] grid = maze.grid;
+
+        fringe1.add(grid[x1][y1]);
+        fringe2.add(grid[grid.length - 1][grid.length - 1]);
+
+        while (!fringe1.isEmpty() && !fringe2.isEmpty()) {
+
+            current1 = fringe1.iterator().next();
+            fringe1.remove(fringe1.iterator().next());
+            current2 = fringe2.iterator().next();
+            fringe2.remove(fringe2.iterator().next());
+
+            if (fringe2.contains(current1))
+                return current1;
+
+            if (fringe1.contains(current2))
+                return current2;
+
+            if (current1.x > 0 && grid[current1.x - 1][current1.y].blocked == false
+                    && !closed_set.contains(grid[current1.x - 1][current1.y])) {
+                fringe1.add(grid[current1.x - 1][current1.y]);
+                grid[current1.x - 1][current1.y].prev = current1;
+            }
+            if (current1.x < grid.length - 1 && grid[current1.x + 1][current1.y].blocked == false
+                    && !closed_set.contains(grid[current1.x + 1][current1.y])) {
+                fringe1.add(grid[current1.x + 1][current1.y]);
+                grid[current1.x + 1][current1.y].prev = current1;
+            }
+            if (current1.y > 0 && grid[current1.x][current1.y - 1].blocked == false
+                    && !closed_set.contains(grid[current1.x][current1.y - 1])) {
+                fringe1.add(grid[current1.x][current1.y - 1]);
+                grid[current1.x][current1.y - 1].prev = current1;
+            }
+            if (current1.y < grid.length - 1 && grid[current1.x][current1.y + 1].blocked == false
+                    && !closed_set.contains(grid[current1.x][current1.y + 1])) {
+                fringe1.add(grid[current1.x][current1.y + 1]);
+                grid[current1.x][current1.y + 1].prev = current1;
+            }
+
+            closed_set.add(current1);
+
+            if (current2.x > 0 && grid[current2.x - 1][current2.y].blocked == false
+                    && !closed_set.contains(grid[current2.x - 1][current2.y])) {
+                fringe2.add(grid[current2.x - 1][current2.y]);
+                grid[current2.x - 1][current2.y].next = current2;
+            }
+            if (current2.x < grid.length - 1 && grid[current2.x + 1][current2.y].blocked == false
+                    && !closed_set.contains(grid[current2.x + 1][current2.y])) {
+                fringe2.add(grid[current2.x + 1][current2.y]);
+                grid[current2.x + 1][current2.y].next = current2;
+            }
+            if (current2.y > 0 && grid[current2.x][current2.y - 1].blocked == false
+                    && !closed_set.contains(grid[current2.x][current2.y - 1])) {
+                fringe2.add(grid[current2.x][current2.y - 1]);
+                grid[current2.x][current2.y - 1].next = current2;
+            }
+            if (current2.y < grid.length - 1 && grid[current2.x][current2.y + 1].blocked == false
+                    && !closed_set.contains(grid[current2.x][current2.y + 1])) {
+                fringe2.add(grid[current2.x][current2.y + 1]);
+                grid[current2.x][current2.y + 1].next = current2;
+            }
+            closed_set.add(current2);
+        }
+        return null;
+    }
+
     public void createPath() {
-        GridTile pathInfo = maze.findPathBetween(startPos.x, startPos.y, maze.grid.length - 1, maze.grid.length - 1);
+        GridTile pathInfo = findPathBetween(startPos.x, startPos.y, maze.grid.length - 1, maze.grid.length - 1);
         while (!pathInfo.equals(startPos)) {
             pathInfo.prev.next = pathInfo;
             pathInfo = pathInfo.prev;

@@ -1,12 +1,9 @@
 import java.util.*;
 
-/*
- * Improvements to make:
- * - Can make a fire fringe to have more efficient fire spread function.
- */
 public class Grid {
     GridTile[][] grid;
     double flammability;
+    HashSet<GridTile> fireFringe;
 
     public Grid(int size, double percentBlocked, double flammability) {
         this.flammability = flammability;
@@ -22,6 +19,9 @@ public class Grid {
             grid[(size - 1) / 2][(size - 1) / 2].blocked = false;
         } while (!isMazeValid(size));
         grid[(size - 1) / 2][(size - 1) / 2].isBurning = true;
+
+        fireFringe = new HashSet<GridTile>();
+        addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2);
     }
 
     public boolean isMazeValid(int size) {
@@ -53,12 +53,30 @@ public class Grid {
     }
 
     public void stepFire() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid.length; j++) {
-                if (Math.random() < (1 - Math.pow(1 - flammability, burningNeighbors(i, j))))
-                    grid[i][j].isBurning = true;
+        Stack<GridTile> currentFireFringe = new Stack<GridTile>();
+        currentFireFringe.addAll(fireFringe);
+
+        while (!currentFireFringe.isEmpty()) {
+            GridTile current = currentFireFringe.pop();
+            if (Math.random() < (1 - Math.pow(1 - flammability, burningNeighbors(current.x, current.y)))) {
+                grid[current.x][current.y].isBurning = true;
+                addNonBurningNeighbors(current.x, current.y);
+                fireFringe.remove(current);
             }
         }
+
+    }
+
+    public void addNonBurningNeighbors(int x, int y) {
+        if (x > 0 && !grid[x - 1][y].isBurning)
+            fireFringe.add(grid[x - 1][y]);
+        if (x < grid.length - 1 && !grid[x + 1][y].isBurning)
+            fireFringe.add(grid[x + 1][y]);
+        if (y > 0 && !grid[x][y - 1].isBurning)
+            fireFringe.add(grid[x][y - 1]);
+        if (y < grid.length - 1 && !grid[x][y + 1].isBurning)
+            fireFringe.add(grid[x][y + 1]);
+
     }
 
     public int burningNeighbors(int x, int y) {
