@@ -1,1 +1,1 @@
-
+This is a project for my Artificial Intelligence course where I have to create a maze which is burning from the middle and then simulate various types of agents trying to travel through the maze. The goal is to collect data on and analyze the strategies of the agents.
