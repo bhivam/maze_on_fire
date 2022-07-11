@@ -1,11 +1,5 @@
 import java.util.*;
 
-enum AgentState {
-    BURNING,
-    SAFE,
-    GOAL
-}
-
 public class AgentOne {
 
     GridTile startPos;
@@ -33,6 +27,8 @@ public class AgentOne {
         fringe1.add(grid[x1][y1]);
         fringe2.add(grid[grid.length - 1][grid.length - 1]);
 
+        current1 = fringe1.iterator().next();
+
         while (!fringe1.isEmpty() && !fringe2.isEmpty()) {
 
             current1 = fringe1.iterator().next();
@@ -47,22 +43,26 @@ public class AgentOne {
                 return current2;
 
             if (current1.x > 0 && grid[current1.x - 1][current1.y].blocked == false
-                    && !closed_set.contains(grid[current1.x - 1][current1.y])) {
+                    && !closed_set.contains(grid[current1.x - 1][current1.y])
+                    && grid[current1.x - 1][current1.y].isBurning == false) {
                 fringe1.add(grid[current1.x - 1][current1.y]);
                 grid[current1.x - 1][current1.y].prev = current1;
             }
             if (current1.x < grid.length - 1 && grid[current1.x + 1][current1.y].blocked == false
-                    && !closed_set.contains(grid[current1.x + 1][current1.y])) {
+                    && !closed_set.contains(grid[current1.x + 1][current1.y])
+                    && grid[current1.x + 1][current1.y].isBurning == false) {
                 fringe1.add(grid[current1.x + 1][current1.y]);
                 grid[current1.x + 1][current1.y].prev = current1;
             }
             if (current1.y > 0 && grid[current1.x][current1.y - 1].blocked == false
-                    && !closed_set.contains(grid[current1.x][current1.y - 1])) {
+                    && !closed_set.contains(grid[current1.x][current1.y - 1])
+                    && grid[current1.x][current1.y - 1].isBurning == false) {
                 fringe1.add(grid[current1.x][current1.y - 1]);
                 grid[current1.x][current1.y - 1].prev = current1;
             }
             if (current1.y < grid.length - 1 && grid[current1.x][current1.y + 1].blocked == false
-                    && !closed_set.contains(grid[current1.x][current1.y + 1])) {
+                    && !closed_set.contains(grid[current1.x][current1.y + 1])
+                    && grid[current1.x][current1.y + 1].isBurning == false) {
                 fringe1.add(grid[current1.x][current1.y + 1]);
                 grid[current1.x][current1.y + 1].prev = current1;
             }
@@ -91,7 +91,7 @@ public class AgentOne {
             }
             closed_set.add(current2);
         }
-        return null;
+        return current1;
     }
 
     public void createPath() {
@@ -103,6 +103,8 @@ public class AgentOne {
     }
 
     public AgentState stepAgent() {
+        if (currentPos == null)
+            return AgentState.BURNING;
         if (currentPos.isBurning)
             return AgentState.BURNING;
         if (currentPos.equals(maze.grid[maze.grid.length - 1][maze.grid.length - 1]))
