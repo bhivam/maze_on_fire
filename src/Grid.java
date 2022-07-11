@@ -1,5 +1,9 @@
 import java.util.*;
 
+/*
+ * Improvements to make:
+ * - Can make a fire fringe to have more efficient fire spread function.
+ */
 public class Grid {
     GridTile[][] grid;
     double flammability;
@@ -79,7 +83,7 @@ public class Grid {
         GridTile current2;
 
         fringe1.add(grid[x1][y1]);
-        fringe2.add(new GridTile(x2, y2, false));
+        fringe2.add(grid[grid.length - 1][grid.length - 1]);
 
         while (!fringe1.isEmpty() && !fringe2.isEmpty()) {
 
@@ -140,42 +144,5 @@ public class Grid {
             closed_set.add(current2);
         }
         return null;
-    }
-
-    public void printMaze() {
-        // GridTile sol = findPathBetween(0, 0, grid.length - 1, grid.length - 1);
-        // HashSet<GridTile> path = new HashSet<GridTile>();
-        // GridTile t = sol;
-
-        // path.add(grid[0][0]);
-        // path.add(grid[grid.length - 1][grid.length - 1]);
-
-        // while (t.prev != null) {
-        // path.add(t);
-        // System.out.println("X: " + t.x + " Y: " + t.y);
-        // t = t.prev;
-        // }
-
-        // t = sol;
-
-        // while (t.next != null) {
-        // path.add(t);
-        // System.out.println("X: " + t.x + " Y: " + t.y);
-        // t = t.next;
-        // }
-
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid.length; j++) {
-                if (grid[i][j].isBurning)
-                    System.out.print("f");
-                else if (grid[i][j].blocked)
-                    System.out.print("#");
-                // else if (path.contains(grid[i][j]))
-                // System.out.print("a");
-                else
-                    System.out.print(" ");
-            }
-            System.out.println();
-        }
     }
 }
