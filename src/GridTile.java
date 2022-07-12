@@ -1,8 +1,13 @@
+import java.util.*;
+
 public class GridTile {
     int x;
     int y;
     boolean blocked;
     boolean isBurning;
+
+    int dist;
+    int EstDistToGoal;
 
     // This is how the path from start to end node will be tracked
     GridTile prev;
@@ -13,6 +18,13 @@ public class GridTile {
         this.x = x;
         this.y = y;
         this.blocked = blocked;
+    }
+
+    public GridTile(int x, int y, boolean blocked, boolean isBurning) {
+        this.x = x;
+        this.y = y;
+        this.blocked = blocked;
+        this.isBurning = isBurning;
     }
 
     @Override
@@ -45,4 +57,13 @@ public class GridTile {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+}
+
+class CompareTile implements Comparator<GridTile> {
+
+    @Override
+    public int compare(GridTile o1, GridTile o2) {
+        return (o1.dist + o1.EstDistToGoal) - (o2.dist + o2.EstDistToGoal);
+    }
+
 }

@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class AgentTwo {
+public class AgentThree {
 
     final int[][] neighborOffsets = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
@@ -8,8 +8,9 @@ public class AgentTwo {
     GridTile endPos;
     GridTile currentPos;
     Grid maze;
+    Grid firePredictionMaze;
 
-    public AgentTwo(Grid maze, int i, int j) {
+    public AgentThree(Grid maze, int i, int j) {
         this.maze = maze;
         startPos = maze.grid[i][j];
         currentPos = startPos;
@@ -17,6 +18,10 @@ public class AgentTwo {
         for (int k = 0; k < maze.grid.length; k++)
             for (int l = 0; l < maze.grid.length; l++)
                 maze.grid[i][j].EstDistToGoal = (maze.grid.length - 1) * 2 - i - j;
+        firePredictionMaze = new Grid(maze);
+        firePredictionMaze.stepFire();
+        firePredictionMaze.stepFire();
+        firePredictionMaze.stepFire();
         findPath();
     }
 
@@ -55,7 +60,8 @@ public class AgentTwo {
                     childY = v.y + neighborOffsets[i][1];
 
                     if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning
-                            && !maze.grid[childX][childY].blocked) {
+                            && !maze.grid[childX][childY].blocked
+                            && !firePredictionMaze.grid[childX][childY].isBurning) {
                         if (d + 1 < maze.grid[childX][childY].dist) {
                             GridTile child = maze.grid[childX][childY];
                             child.dist = d + 1;
@@ -94,6 +100,7 @@ public class AgentTwo {
             findPath();
         currentPos = currentPos.next;
         maze.stepFire();
+        firePredictionMaze.stepFire();
 
         return state;
     }

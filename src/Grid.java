@@ -24,6 +24,22 @@ public class Grid {
         addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2);
     }
 
+    public Grid(Grid copy) {
+        flammability = copy.flammability;
+        int size = copy.grid.length;
+
+        grid = new GridTile[size][size];
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid.length; j++) {
+                grid[i][j] = new GridTile(i, j, copy.grid[i][j].blocked);
+            }
+        }
+        grid[(size - 1) / 2][(size - 1) / 2].isBurning = true;
+
+        fireFringe = new HashSet<GridTile>();
+        addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2);
+    }
+
     public boolean isMazeValid(int size) {
         if (findPathBetween(0, 0, (size - 1) / 2, (size - 1) / 2) == null
                 || findPathBetween(0, size - 1, (size - 1) / 2, (size - 1) / 2) == null
@@ -68,13 +84,13 @@ public class Grid {
     }
 
     public void addNonBurningNeighbors(int x, int y) {
-        if (x > 0 && !grid[x - 1][y].isBurning)
+        if (x > 0 && !grid[x - 1][y].isBurning && !grid[x - 1][y].blocked)
             fireFringe.add(grid[x - 1][y]);
-        if (x < grid.length - 1 && !grid[x + 1][y].isBurning)
+        if (x < grid.length - 1 && !grid[x + 1][y].isBurning && !grid[x + 1][y].blocked)
             fireFringe.add(grid[x + 1][y]);
-        if (y > 0 && !grid[x][y - 1].isBurning)
+        if (y > 0 && !grid[x][y - 1].isBurning && !grid[x][y - 1].blocked)
             fireFringe.add(grid[x][y - 1]);
-        if (y < grid.length - 1 && !grid[x][y + 1].isBurning)
+        if (y < grid.length - 1 && !grid[x][y + 1].isBurning && !grid[x][y + 1].blocked)
             fireFringe.add(grid[x][y + 1]);
 
     }
@@ -163,4 +179,5 @@ public class Grid {
         }
         return null;
     }
+
 }

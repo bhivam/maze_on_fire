@@ -1,5 +1,6 @@
 enum AgentState {
     BURNING,
     SAFE,
-    GOAL
+    GOAL,
+    NO_PATH
 }

@@ -70,33 +70,38 @@ public class AgentOne {
             closed_set.add(current1);
 
             if (current2.x > 0 && grid[current2.x - 1][current2.y].blocked == false
-                    && !closed_set.contains(grid[current2.x - 1][current2.y])) {
+                    && !closed_set.contains(grid[current2.x - 1][current2.y])
+                    && grid[current2.x - 1][current2.y].isBurning == false) {
                 fringe2.add(grid[current2.x - 1][current2.y]);
                 grid[current2.x - 1][current2.y].next = current2;
             }
             if (current2.x < grid.length - 1 && grid[current2.x + 1][current2.y].blocked == false
-                    && !closed_set.contains(grid[current2.x + 1][current2.y])) {
+                    && !closed_set.contains(grid[current2.x + 1][current2.y])
+                    && grid[current2.x + 1][current2.y].isBurning == false) {
                 fringe2.add(grid[current2.x + 1][current2.y]);
                 grid[current2.x + 1][current2.y].next = current2;
             }
             if (current2.y > 0 && grid[current2.x][current2.y - 1].blocked == false
-                    && !closed_set.contains(grid[current2.x][current2.y - 1])) {
+                    && !closed_set.contains(grid[current2.x][current2.y - 1])
+                    && grid[current2.x][current2.y - 1].isBurning == false) {
                 fringe2.add(grid[current2.x][current2.y - 1]);
                 grid[current2.x][current2.y - 1].next = current2;
             }
             if (current2.y < grid.length - 1 && grid[current2.x][current2.y + 1].blocked == false
-                    && !closed_set.contains(grid[current2.x][current2.y + 1])) {
+                    && !closed_set.contains(grid[current2.x][current2.y + 1])
+                    && grid[current2.x][current2.y + 1].isBurning == false) {
                 fringe2.add(grid[current2.x][current2.y + 1]);
                 grid[current2.x][current2.y + 1].next = current2;
             }
             closed_set.add(current2);
         }
+        System.out.println("hello");
         return current1;
     }
 
     public void createPath() {
         GridTile pathInfo = findPathBetween(startPos.x, startPos.y, maze.grid.length - 1, maze.grid.length - 1);
-        while (!pathInfo.equals(startPos)) {
+        while (!pathInfo.equals(currentPos)) {
             pathInfo.prev.next = pathInfo;
             pathInfo = pathInfo.prev;
         }
@@ -104,13 +109,13 @@ public class AgentOne {
 
     public AgentState stepAgent() {
         if (currentPos == null)
-            return AgentState.BURNING;
+            return AgentState.NO_PATH;
+        currentPos = currentPos.next;
+        maze.stepFire();
         if (currentPos.isBurning)
             return AgentState.BURNING;
         if (currentPos.equals(maze.grid[maze.grid.length - 1][maze.grid.length - 1]))
             return AgentState.GOAL;
-        currentPos = currentPos.next;
-        maze.stepFire();
         return AgentState.SAFE;
 
     }
