@@ -8,6 +8,7 @@ public class AgentTwo {
     GridTile endPos;
     GridTile currentPos;
     Grid maze;
+    boolean pathExists = true;
 
     public AgentTwo(Grid maze, int i, int j) {
         this.maze = maze;
@@ -24,9 +25,18 @@ public class AgentTwo {
         return x >= 0 && x < maze.grid.length && y >= 0 && y < maze.grid.length;
     }
 
-    public void findPath() {
+    public void clearPreviousPath() {
+        for (int i = 0; i < maze.grid.length; i++) {
+            for (int j = 0; j < maze.grid.length; j++) {
+                maze.grid[i][j].prev = null;
+                maze.grid[i][j].next = null;
+            }
+        }
+    }
+
+    public boolean findPath() {
+        clearPreviousPath();
         HashSet<GridTile> closedSet = new HashSet<GridTile>();
-        HashMap<GridTile, GridTile> prev = new HashMap<GridTile, GridTile>();
 
         PriorityQueue<GridTile> fringe = new PriorityQueue<GridTile>(1, new CompareTile());
 
@@ -37,11 +47,10 @@ public class AgentTwo {
         }
 
         currentPos.dist = 0;
-        prev.put(currentPos, currentPos);
         fringe.add(currentPos);
 
         GridTile v;
-        int d;
+        double d;
 
         while (!fringe.isEmpty()) {
             v = fringe.poll();
@@ -74,12 +83,12 @@ public class AgentTwo {
 
         while (path != currentPos) {
             if (path.prev == null) {
-                System.out.println("uhoh");
+                return false;
             }
             path.prev.next = path;
             path = path.prev;
         }
-
+        return true;
     }
 
     public AgentState stepAgent() {
@@ -91,9 +100,13 @@ public class AgentTwo {
         else
             state = AgentState.SAFE;
         if (pathBurning())
-            findPath();
-        currentPos = currentPos.next;
-        maze.stepFire();
+            pathExists = findPath();
+        if (pathExists) {
+            currentPos = currentPos.next;
+            maze.stepFire();
+        } else {
+            state = AgentState.NO_PATH;
+        }
 
         return state;
     }

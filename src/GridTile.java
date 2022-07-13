@@ -6,8 +6,8 @@ public class GridTile {
     boolean blocked;
     boolean isBurning;
 
-    int dist;
-    int EstDistToGoal;
+    double dist;
+    double EstDistToGoal;
 
     // This is how the path from start to end node will be tracked
     GridTile prev;
@@ -63,7 +63,6 @@ class CompareTile implements Comparator<GridTile> {
 
     @Override
     public int compare(GridTile o1, GridTile o2) {
-        return (o1.dist + o1.EstDistToGoal) - (o2.dist + o2.EstDistToGoal);
+        return (int) ((o1.dist + o1.EstDistToGoal) - (o2.dist + o2.EstDistToGoal) + 0.5);
     }
-
 }

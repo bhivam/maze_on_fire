@@ -2,7 +2,7 @@ import java.util.*;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 10; i++) {
             double start = System.currentTimeMillis();
             AgentData();
             double now = System.currentTimeMillis();
@@ -11,7 +11,7 @@ public class App {
     }
 
     public static void AgentData() {
-        int numOfTrials = 10000;
+        int numOfTrials = 1000;
         int[] AgentOneStats = testAgents(0.1, 0.3, numOfTrials, 51);
         System.out.println("Agent One Success Rate: " + ((double) AgentOneStats[0]) /
                 numOfTrials);
@@ -63,6 +63,8 @@ public class App {
                 break;
             if (status == AgentState.GOAL)
                 return 1;
+            if (status == AgentState.NO_PATH)
+                break;
         }
         return 0;
     }
@@ -76,6 +78,8 @@ public class App {
                 break;
             if (status == AgentState.GOAL)
                 return 1;
+            if (status == AgentState.NO_PATH)
+                break;
         }
         return 0;
     }

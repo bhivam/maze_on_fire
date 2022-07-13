@@ -9,6 +9,7 @@ public class AgentThree {
     GridTile currentPos;
     Grid maze;
     Grid firePredictionMaze;
+    boolean pathExists = true;
 
     public AgentThree(Grid maze, int i, int j) {
         this.maze = maze;
@@ -18,6 +19,8 @@ public class AgentThree {
         for (int k = 0; k < maze.grid.length; k++)
             for (int l = 0; l < maze.grid.length; l++)
                 maze.grid[i][j].EstDistToGoal = (maze.grid.length - 1) * 2 - i - j;
+        // Math.pow((Math.pow((maze.grid.length - 1 - i), 2)
+        // + Math.pow((maze.grid.length - 1 - i), 2)), 0.5);
         firePredictionMaze = new Grid(maze);
         firePredictionMaze.stepFire();
         firePredictionMaze.stepFire();
@@ -29,7 +32,7 @@ public class AgentThree {
         return x >= 0 && x < maze.grid.length && y >= 0 && y < maze.grid.length;
     }
 
-    public void findPath() {
+    public boolean findPath() {
         HashSet<GridTile> closedSet = new HashSet<GridTile>();
         HashMap<GridTile, GridTile> prev = new HashMap<GridTile, GridTile>();
 
@@ -46,7 +49,7 @@ public class AgentThree {
         fringe.add(currentPos);
 
         GridTile v;
-        int d;
+        double d;
 
         while (!fringe.isEmpty()) {
             v = fringe.poll();
@@ -65,8 +68,6 @@ public class AgentThree {
                         if (d + 1 < maze.grid[childX][childY].dist) {
                             GridTile child = maze.grid[childX][childY];
                             child.dist = d + 1;
-                            if (fringe.contains(child))
-                                fringe.remove(child);
                             fringe.add(child);
                             child.prev = v;
                         }
@@ -80,12 +81,12 @@ public class AgentThree {
 
         while (path != currentPos) {
             if (path.prev == null) {
-                System.out.println("uhoh");
+                return false;
             }
             path.prev.next = path;
             path = path.prev;
         }
-
+        return true;
     }
 
     public AgentState stepAgent() {
@@ -97,10 +98,14 @@ public class AgentThree {
         else
             state = AgentState.SAFE;
         if (pathBurning())
-            findPath();
-        currentPos = currentPos.next;
-        maze.stepFire();
-        firePredictionMaze.stepFire();
+            pathExists = findPath();
+        if (pathExists) {
+            currentPos = currentPos.next;
+            maze.stepFire();
+            firePredictionMaze.stepFire();
+        } else {
+            state = AgentState.NO_PATH;
+        }
 
         return state;
     }
