@@ -2,7 +2,7 @@ import java.util.*;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1; i++) {
             double start = System.currentTimeMillis();
             AgentData();
             double now = System.currentTimeMillis();
@@ -11,14 +11,14 @@ public class App {
     }
 
     public static void AgentData() {
-        int numOfTrials = 100;
-        int[] AgentStats = testAgents(0.2, 0.3, numOfTrials, 51);
+        int numOfTrials = 10000;
+        int[] AgentStats = testAgents(0.05, 0.3, numOfTrials, 51);
         System.out.println("Agent One Success Rate: " + ((double) AgentStats[0]) /
                 numOfTrials);
         System.out.println("Agent Two Success Rate: " + ((double) AgentStats[1]) /
                 numOfTrials);
-        System.out.println("Agent Three Success Rate: " + ((double) AgentStats[2])
-                / numOfTrials);
+        System.out.println("Agent Three Success Rate: " + ((double) AgentStats[2]) /
+                numOfTrials);
     }
 
     public static int[] testAgents(double flammability, double percentBlocked, int numOfTrials, int mazeSize) {
@@ -33,8 +33,8 @@ public class App {
             grid1 = new Grid(mazeSize, percentBlocked, flammability);
             grid2 = new Grid(grid1);
             grid3 = new Grid(grid2);
-            goalOne += runAgentOneTrial(grid1);
-            goalTwo += runAgentTwoTrial(grid2);
+            // goalOne += runAgentOneTrial(grid1);
+            // goalTwo += runAgentTwoTrial(grid2);
             goalThree += runAgentThreeTrial(grid3);
         }
         return new int[] { goalOne, goalTwo, goalThree };

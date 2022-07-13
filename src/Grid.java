@@ -4,6 +4,7 @@ public class Grid {
     GridTile[][] grid;
     double flammability;
     HashSet<GridTile> fireFringe;
+    HashSet<GridTile> predictedFireFringe;
 
     public Grid(int size, double percentBlocked, double flammability) {
         this.flammability = flammability;
@@ -21,7 +22,8 @@ public class Grid {
         grid[(size - 1) / 2][(size - 1) / 2].isBurning = true;
 
         fireFringe = new HashSet<GridTile>();
-        addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2);
+        predictedFireFringe = new HashSet<GridTile>();
+        addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2, fireFringe);
     }
 
     public Grid(Grid copy) {
@@ -31,11 +33,14 @@ public class Grid {
         grid = new GridTile[size][size];
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
-                grid[i][j] = new GridTile(i, j, copy.grid[i][j].blocked, copy.grid[i][j].isBurning);
+                grid[i][j] = new GridTile(i, j, copy.grid[i][j].blocked);
             }
         }
+        grid[(size - 1) / 2][(size - 1) / 2].isBurning = true;
+
         fireFringe = new HashSet<GridTile>();
-        addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2);
+        predictedFireFringe = new HashSet<GridTile>();
+        addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2, fireFringe);
     }
 
     public boolean isMazeValid(int size) {
@@ -74,23 +79,63 @@ public class Grid {
             GridTile current = currentFireFringe.pop();
             if (Math.random() < (1 - Math.pow(1 - flammability, burningNeighbors(current.x, current.y)))) {
                 grid[current.x][current.y].isBurning = true;
-                addNonBurningNeighbors(current.x, current.y);
+                addNonBurningNeighbors(current.x, current.y, fireFringe);
                 fireFringe.remove(current);
             }
         }
-
     }
 
-    public void addNonBurningNeighbors(int x, int y) {
-        if (x > 0 && !grid[x - 1][y].isBurning && !grid[x - 1][y].blocked)
-            fireFringe.add(grid[x - 1][y]);
-        if (x < grid.length - 1 && !grid[x + 1][y].isBurning && !grid[x + 1][y].blocked)
-            fireFringe.add(grid[x + 1][y]);
-        if (y > 0 && !grid[x][y - 1].isBurning && !grid[x][y - 1].blocked)
-            fireFringe.add(grid[x][y - 1]);
-        if (y < grid.length - 1 && !grid[x][y + 1].isBurning && !grid[x][y + 1].blocked)
-            fireFringe.add(grid[x][y + 1]);
+    public void stepPredictedFire() {
+        Stack<GridTile> currentFireFringe = new Stack<GridTile>();
+        predictedFireFringe.removeAll(predictedFireFringe);
+        predictedFireFringe.addAll(fireFringe);
 
+        for (int i = 0; i < 3; i++) {
+            currentFireFringe.addAll(predictedFireFringe);
+            while (!currentFireFringe.isEmpty()) {
+                GridTile current = currentFireFringe.pop();
+                if (Math.random() < (1 - Math.pow(1 - flammability, futureBurningNeighbors(current.x, current.y)))) {
+                    grid[current.x][current.y].isGoingToBurn = true;
+                    addFutureNonBurningNeighbors(current.x, current.y, predictedFireFringe);
+                    predictedFireFringe.remove(current);
+                }
+            }
+        }
+    }
+
+    public void addFutureNonBurningNeighbors(int x, int y, HashSet<GridTile> fringe) {
+        if (x > 0 && !grid[x - 1][y].isBurning && !grid[x - 1][y].blocked)
+            fringe.add(grid[x - 1][y]);
+        if (x < grid.length - 1 && !grid[x + 1][y].isBurning && !grid[x + 1][y].blocked)
+            fringe.add(grid[x + 1][y]);
+        if (y > 0 && !grid[x][y - 1].isBurning && !grid[x][y - 1].blocked)
+            fringe.add(grid[x][y - 1]);
+        if (y < grid.length - 1 && !grid[x][y + 1].isBurning && !grid[x][y + 1].blocked)
+            fringe.add(grid[x][y + 1]);
+    }
+
+    public void addNonBurningNeighbors(int x, int y, HashSet<GridTile> fringe) {
+        if (x > 0 && !grid[x - 1][y].isBurning && !grid[x - 1][y].blocked)
+            fringe.add(grid[x - 1][y]);
+        if (x < grid.length - 1 && !grid[x + 1][y].isBurning && !grid[x + 1][y].blocked)
+            fringe.add(grid[x + 1][y]);
+        if (y > 0 && !grid[x][y - 1].isBurning && !grid[x][y - 1].blocked)
+            fringe.add(grid[x][y - 1]);
+        if (y < grid.length - 1 && !grid[x][y + 1].isBurning && !grid[x][y + 1].blocked)
+            fringe.add(grid[x][y + 1]);
+    }
+
+    public int futureBurningNeighbors(int x, int y) {
+        int count = 0;
+        if (x > 0 && (grid[x - 1][y].isBurning || grid[x - 1][y].isGoingToBurn))
+            count++;
+        if (x < grid.length - 1 && (grid[x + 1][y].isBurning || grid[x + 1][y].isGoingToBurn))
+            count++;
+        if (y > 0 && (grid[x][y - 1].isBurning || grid[x][y - 1].isGoingToBurn))
+            count++;
+        if (y < grid.length - 1 && (grid[x][y + 1].isBurning || grid[x][y + 1].isGoingToBurn))
+            count++;
+        return count;
     }
 
     public int burningNeighbors(int x, int y) {

@@ -5,6 +5,7 @@ public class GridTile {
     int y;
     boolean blocked;
     boolean isBurning;
+    boolean isGoingToBurn;
 
     double dist;
     double EstDistToGoal;
