@@ -31,11 +31,9 @@ public class Grid {
         grid = new GridTile[size][size];
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
-                grid[i][j] = new GridTile(i, j, copy.grid[i][j].blocked);
+                grid[i][j] = new GridTile(i, j, copy.grid[i][j].blocked, copy.grid[i][j].isBurning);
             }
         }
-        grid[(size - 1) / 2][(size - 1) / 2].isBurning = true;
-
         fireFringe = new HashSet<GridTile>();
         addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2);
     }
