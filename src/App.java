@@ -11,13 +11,13 @@ public class App {
     }
 
     public static void AgentData() {
-        int numOfTrials = 1000;
-        int[] AgentOneStats = testAgents(0.1, 0.3, numOfTrials, 51);
-        System.out.println("Agent One Success Rate: " + ((double) AgentOneStats[0]) /
+        int numOfTrials = 100;
+        int[] AgentStats = testAgents(0.2, 0.3, numOfTrials, 51);
+        System.out.println("Agent One Success Rate: " + ((double) AgentStats[0]) /
                 numOfTrials);
-        System.out.println("Agent Two Success Rate: " + ((double) AgentOneStats[1]) /
+        System.out.println("Agent Two Success Rate: " + ((double) AgentStats[1]) /
                 numOfTrials);
-        System.out.println("Agent Three Success Rate: " + ((double) AgentOneStats[2])
+        System.out.println("Agent Three Success Rate: " + ((double) AgentStats[2])
                 / numOfTrials);
     }
 

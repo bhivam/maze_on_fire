@@ -99,7 +99,7 @@ public class AgentTwo {
             state = AgentState.BURNING;
         else
             state = AgentState.SAFE;
-        if (pathBurning())
+        if (!pathBurning())
             pathExists = findPath();
         if (pathExists) {
             currentPos = currentPos.next;
@@ -115,10 +115,10 @@ public class AgentTwo {
         GridTile path = endPos;
         while (path != currentPos) {
             if (path.isBurning)
-                return true;
+                return false;
             path = path.prev;
         }
-        return false;
+        return true;
     }
 
     public void printMaze() {

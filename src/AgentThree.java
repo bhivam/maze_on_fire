@@ -63,7 +63,6 @@ public class AgentThree {
                     childY = v.y + neighborOffsets[i][1];
 
                     if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning
-                            && !maze.grid[childX][childY].blocked
                             && !firePredictionMaze.grid[childX][childY].isBurning) {
                         if (d + 1 < maze.grid[childX][childY].dist) {
                             GridTile child = maze.grid[childX][childY];
@@ -97,11 +96,14 @@ public class AgentThree {
             state = AgentState.BURNING;
         else
             state = AgentState.SAFE;
-        if (pathBurning())
+        if (pathNotBurning())
             pathExists = findPath();
         if (pathExists) {
             currentPos = currentPos.next;
             maze.stepFire();
+            firePredictionMaze = new Grid(maze);
+            firePredictionMaze.stepFire();
+            firePredictionMaze.stepFire();
             firePredictionMaze.stepFire();
         } else {
             state = AgentState.NO_PATH;
@@ -110,7 +112,7 @@ public class AgentThree {
         return state;
     }
 
-    public boolean pathBurning() {
+    public boolean pathNotBurning() {
         GridTile path = endPos;
         while (path != currentPos) {
             if (path.isBurning)
