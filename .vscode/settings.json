@@ -6,4 +6,6 @@
     ],
     "better-comments.multilineComments": true,
     "better-comments.highlightPlainText": true,
+    "java.format.settings.url": "./eclipse-java-google-style.xml"
+      
 }

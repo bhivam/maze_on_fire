@@ -2,17 +2,20 @@ import java.util.*;
 
 public class App {
     public static void main(String[] args) throws Exception {
+        double flammability = 0.3;
+        double percentBlocked = 0.3;
+        int numOfTrials = 10000;
+        int size = 51;
         for (int i = 0; i < 1; i++) {
             double start = System.currentTimeMillis();
-            AgentData();
+            AgentData(flammability, percentBlocked, numOfTrials, size);
             double now = System.currentTimeMillis();
             System.out.println((now - start) / 1000);
         }
     }
 
-    public static void AgentData() {
-        int numOfTrials = 10000;
-        int[] AgentStats = testAgents(0.05, 0.3, numOfTrials, 51);
+    public static void AgentData(double flammability, double percentBlocked, int numOfTrials, int size) {
+        int[] AgentStats = testAgents(flammability, percentBlocked, numOfTrials, size);
         System.out.println("Agent One Success Rate: " + ((double) AgentStats[0]) /
                 numOfTrials);
         System.out.println("Agent Two Success Rate: " + ((double) AgentStats[1]) /
