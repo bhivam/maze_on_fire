@@ -1,6 +1,8 @@
 import java.util.*;
 
-public class AgentTwo {
+import java.util.*;
+
+public class AgentFour {
 
     final int[][] neighborOffsets = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
@@ -10,7 +12,13 @@ public class AgentTwo {
     Grid maze;
     boolean pathExists = true;
 
-    public AgentTwo(Grid maze, int i, int j) {
+    HashSet<GridTile> visited = new HashSet<GridTile>();
+    HashSet<GridTile> path = new HashSet<GridTile>();
+
+    int numVisited = 0;
+    int numPath = 0;
+
+    public AgentFour(Grid maze, int i, int j) {
         this.maze = maze;
         startPos = maze.grid[i][j];
         currentPos = startPos;
@@ -18,11 +26,9 @@ public class AgentTwo {
         for (int k = 0; k < maze.grid.length; k++)
             for (int l = 0; l < maze.grid.length; l++)
                 maze.grid[i][j].EstDistToGoal = (maze.grid.length - 1) * 2 - i - j;
+        // Math.pow((Math.pow((maze.grid.length - 1 - i), 2)
+        // + Math.pow((maze.grid.length - 1 - i), 2)), 0.5);
         findPath();
-    }
-
-    public boolean isValid(int x, int y) {
-        return x >= 0 && x < maze.grid.length && y >= 0 && y < maze.grid.length;
     }
 
     public void clearPreviousPath() {
@@ -34,42 +40,50 @@ public class AgentTwo {
         }
     }
 
-    public boolean findPath() {
-        clearPreviousPath();
-        HashSet<GridTile> closedSet = new HashSet<GridTile>();
+    public boolean isValid(int x, int y) {
+        return x >= 0 && x < maze.grid.length && y >= 0 && y < maze.grid.length;
+    }
 
-        PriorityQueue<GridTile> fringe = new PriorityQueue<GridTile>(1, new CompareTile());
+    public boolean findPath() {
+        // clearPreviousPath();
+        HashSet<GridTile> closedSet = new HashSet<GridTile>();
+        HashMap<GridTile, GridTile> prev = new HashMap<GridTile, GridTile>();
+
+        PriorityQueue<GridTile> fringe = new PriorityQueue<GridTile>(11, new Comparator<GridTile>() {
+            @Override
+            public int compare(GridTile o1, GridTile o2) {
+                return (int) ((o1.accumulatedCost + o1.EstDistToGoal) - (o2.accumulatedCost + o2.EstDistToGoal) + 0.5);
+            }
+        });
 
         for (int i = 0; i < maze.grid.length; i++) {
             for (int j = 0; j < maze.grid.length; j++) {
-                maze.grid[i][j].dist = (int) Math.pow(maze.grid.length, 3);
+                maze.grid[i][j].accumulatedCost = 99999;
             }
         }
 
-        currentPos.dist = 0;
+        currentPos.accumulatedCost = 1;
+        prev.put(currentPos, currentPos);
         fringe.add(currentPos);
 
         GridTile v;
-        double d;
-
         while (!fringe.isEmpty()) {
             v = fringe.poll();
-            d = v.dist;
-
             int childX;
             int childY;
             for (int i = 0; i < neighborOffsets.length; i++) {
                 childX = v.x + neighborOffsets[i][0];
                 childY = v.y + neighborOffsets[i][1];
 
-                if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning
-                        && !maze.grid[childX][childY].isGoingToBurn && !maze.grid[childX][childY].blocked
-                        && !closedSet.contains(maze.grid[childX][childY])) {
-                    if (d + 1 + maze.grid[childX][childY].EstDistToGoal < maze.grid[childX][childY].dist
-                            + maze.grid[childX][childY].EstDistToGoal) {
+                if (isValid(childX, childY)) {
+                    if (v.accumulatedCost
+                            + maze.grid[childX][childY].costToEnter < maze.grid[childX][childY].accumulatedCost
+                                    + maze.grid[childX][childY].EstDistToGoal) {
                         GridTile child = maze.grid[childX][childY];
-                        child.dist = d + 1;
+                        child.accumulatedCost = v.accumulatedCost
+                                + maze.grid[childX][childY].costToEnter;
                         fringe.add(child);
+                        numVisited++;
                         child.prev = v;
                     }
                 }
@@ -79,10 +93,13 @@ public class AgentTwo {
 
         while (path != currentPos) {
             if (path.prev == null) {
+                numPath = 0;
+                numVisited = 0;
                 return false;
             }
             path.prev.next = path;
             path = path.prev;
+            numPath++;
         }
         return true;
     }
@@ -100,6 +117,7 @@ public class AgentTwo {
         if (pathExists) {
             currentPos = currentPos.next;
             maze.stepFire();
+            maze.stepPredictedFire();
         } else {
             state = AgentState.NO_PATH;
         }
@@ -118,7 +136,6 @@ public class AgentTwo {
     }
 
     public void printMaze() {
-        findPath();
         HashSet<GridTile> fullPath = new HashSet<GridTile>();
 
         GridTile path = endPos;

@@ -5,12 +5,16 @@ public class Grid {
     double flammability;
     HashSet<GridTile> fireFringe;
     long randomSeed;
+    long randomSeed2;
     Random rand;
+    Random rand2; // for predicted maze comparison between agent 3 and 4
 
-    public Grid(int size, double percentBlocked, double flammability, long randomSeed) {
+    public Grid(int size, double percentBlocked, double flammability, long randomSeed, long randomSeed2) {
         this.randomSeed = randomSeed;
+        this.randomSeed2 = randomSeed2;
         this.flammability = flammability;
         this.rand = new Random(randomSeed);
+        this.rand2 = new Random(randomSeed2);
         if (size % 2 == 0)
             size++;
 
@@ -32,6 +36,7 @@ public class Grid {
         this.randomSeed = copy.randomSeed;
         this.flammability = copy.flammability;
         this.rand = new Random(randomSeed);
+        this.rand2 = new Random(randomSeed2);
         int size = copy.grid.length;
 
         grid = new GridTile[size][size];
@@ -71,6 +76,7 @@ public class Grid {
                 newGrid[i][j] = Math.random() < percentBlocked
                         ? newGrid[i][j] = new GridTile(i, j, true)
                         : new GridTile(i, j, false);
+
         return newGrid;
     }
 
@@ -82,6 +88,7 @@ public class Grid {
             GridTile current = currentFireFringe.pop();
             if (rand.nextDouble(1) < (1 - Math.pow(1 - flammability, burningNeighbors(current.x, current.y)))) {
                 grid[current.x][current.y].isBurning = true;
+                grid[current.x][current.y].costToEnter += 500;
                 addNonBurningNeighbors(current.x, current.y, fireFringe);
                 fireFringe.remove(current);
             }
@@ -89,6 +96,13 @@ public class Grid {
     }
 
     public void stepPredictedFire() {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid.length; j++) {
+                if (grid[i][j].isGoingToBurn)
+                    grid[i][j].costToEnter -= 50;
+                grid[i][j].isGoingToBurn = false;
+            }
+        }
         Stack<GridTile> currentFireFringe = new Stack<GridTile>();
         HashSet<GridTile> predictedFireFringe = new HashSet<>();
         predictedFireFringe.addAll(fireFringe);
@@ -97,8 +111,10 @@ public class Grid {
             currentFireFringe.addAll(predictedFireFringe);
             while (!currentFireFringe.isEmpty()) {
                 GridTile current = currentFireFringe.pop();
-                if (Math.random() < (1 - Math.pow(1 - flammability, futureBurningNeighbors(current.x, current.y)))) {
+                if (rand2.nextDouble(
+                        1) < (1 - Math.pow(1 - flammability, futureBurningNeighbors(current.x, current.y)))) {
                     grid[current.x][current.y].isGoingToBurn = true;
+                    grid[current.x][current.y].costToEnter += 100;
                     addFutureNonBurningNeighbors(current.x, current.y, predictedFireFringe);
                     predictedFireFringe.remove(current);
                 }

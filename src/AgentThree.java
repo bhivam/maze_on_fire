@@ -43,11 +43,11 @@ public class AgentThree {
 
         PriorityQueue<GridTile> fringe = new PriorityQueue<GridTile>(1, new CompareTile());
 
-        // for (int i = 0; i < maze.grid.length; i++) {
-        // for (int j = 0; j < maze.grid.length; j++) {
-        // maze.grid[i][j].dist = (int) Math.pow(maze.grid.length, 3);
-        // }
-        // }
+        for (int i = 0; i < maze.grid.length; i++) {
+            for (int j = 0; j < maze.grid.length; j++) {
+                maze.grid[i][j].dist = (int) Math.pow(maze.grid.length, 3);
+            }
+        }
 
         currentPos.dist = 0;
         prev.put(currentPos, currentPos);
@@ -123,8 +123,7 @@ public class AgentThree {
                     childX = v.x + neighborOffsets[i][0];
                     childY = v.y + neighborOffsets[i][1];
 
-                    if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning
-                            && !maze.grid[childX][childY].blocked) {
+                    if (isValid(childX, childY)) {
                         if (d + 1 < maze.grid[childX][childY].dist) {
                             GridTile child = maze.grid[childX][childY];
                             child.dist = d + 1;

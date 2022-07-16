@@ -1,6 +1,9 @@
 import java.util.*;
 
 public class GridTile {
+    int costToEnter = 1;
+    int accumulatedCost = 1;
+
     int x;
     int y;
     boolean blocked;
@@ -19,6 +22,8 @@ public class GridTile {
         this.x = x;
         this.y = y;
         this.blocked = blocked;
+        if (blocked)
+            costToEnter += 100000;
     }
 
     public GridTile(int x, int y, boolean blocked, boolean isBurning) {
