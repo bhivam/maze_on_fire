@@ -1,8 +1,8 @@
-import java.util.*;
+import java.util.Random;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        double flammability = 0.3;
+        double flammability = 0.15;
         double percentBlocked = 0.3;
         int numOfTrials = 10000;
         int size = 51;
@@ -33,11 +33,11 @@ public class App {
         Grid grid3;
 
         for (int i = 0; i < numOfTrials; i++) {
-            grid1 = new Grid(mazeSize, percentBlocked, flammability);
+            grid1 = new Grid(mazeSize, percentBlocked, flammability, System.currentTimeMillis());
             grid2 = new Grid(grid1);
             grid3 = new Grid(grid2);
-            // goalOne += runAgentOneTrial(grid1);
-            // goalTwo += runAgentTwoTrial(grid2);
+            goalOne += runAgentOneTrial(grid1);
+            goalTwo += runAgentTwoTrial(grid2);
             goalThree += runAgentThreeTrial(grid3);
         }
         return new int[] { goalOne, goalTwo, goalThree };

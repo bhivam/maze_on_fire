@@ -4,10 +4,13 @@ public class Grid {
     GridTile[][] grid;
     double flammability;
     HashSet<GridTile> fireFringe;
-    HashSet<GridTile> predictedFireFringe;
+    long randomSeed;
+    Random rand;
 
-    public Grid(int size, double percentBlocked, double flammability) {
+    public Grid(int size, double percentBlocked, double flammability, long randomSeed) {
+        this.randomSeed = randomSeed;
         this.flammability = flammability;
+        this.rand = new Random(randomSeed);
         if (size % 2 == 0)
             size++;
 
@@ -22,12 +25,13 @@ public class Grid {
         grid[(size - 1) / 2][(size - 1) / 2].isBurning = true;
 
         fireFringe = new HashSet<GridTile>();
-        predictedFireFringe = new HashSet<GridTile>();
         addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2, fireFringe);
     }
 
     public Grid(Grid copy) {
-        flammability = copy.flammability;
+        this.randomSeed = copy.randomSeed;
+        this.flammability = copy.flammability;
+        this.rand = new Random(randomSeed);
         int size = copy.grid.length;
 
         grid = new GridTile[size][size];
@@ -39,7 +43,6 @@ public class Grid {
         grid[(size - 1) / 2][(size - 1) / 2].isBurning = true;
 
         fireFringe = new HashSet<GridTile>();
-        predictedFireFringe = new HashSet<GridTile>();
         addNonBurningNeighbors((size - 1) / 2, (size - 1) / 2, fireFringe);
     }
 
@@ -77,7 +80,7 @@ public class Grid {
 
         while (!currentFireFringe.isEmpty()) {
             GridTile current = currentFireFringe.pop();
-            if (Math.random() < (1 - Math.pow(1 - flammability, burningNeighbors(current.x, current.y)))) {
+            if (rand.nextDouble(1) < (1 - Math.pow(1 - flammability, burningNeighbors(current.x, current.y)))) {
                 grid[current.x][current.y].isBurning = true;
                 addNonBurningNeighbors(current.x, current.y, fireFringe);
                 fireFringe.remove(current);
@@ -87,7 +90,7 @@ public class Grid {
 
     public void stepPredictedFire() {
         Stack<GridTile> currentFireFringe = new Stack<GridTile>();
-        predictedFireFringe.removeAll(predictedFireFringe);
+        HashSet<GridTile> predictedFireFringe = new HashSet<>();
         predictedFireFringe.addAll(fireFringe);
 
         for (int i = 0; i < 3; i++) {

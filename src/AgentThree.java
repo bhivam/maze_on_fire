@@ -68,7 +68,7 @@ public class AgentThree {
                     childY = v.y + neighborOffsets[i][1];
 
                     if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning
-                            && !maze.grid[childX][childY].isGoingToBurn) {
+                            && !maze.grid[childX][childY].isGoingToBurn && !maze.grid[childX][childY].blocked) {
                         if (d + 1 + maze.grid[childX][childY].EstDistToGoal < maze.grid[childX][childY].dist
                                 + maze.grid[childX][childY].EstDistToGoal) {
                             GridTile child = maze.grid[childX][childY];
