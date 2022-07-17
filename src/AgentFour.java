@@ -1,10 +1,9 @@
 import java.util.*;
 
-import java.util.*;
-
 public class AgentFour {
 
     final int[][] neighborOffsets = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+    // to make iterating through child nodes easy
 
     GridTile startPos;
     GridTile endPos;
@@ -15,10 +14,11 @@ public class AgentFour {
     HashSet<GridTile> visited = new HashSet<GridTile>();
     HashSet<GridTile> path = new HashSet<GridTile>();
 
-    int numVisited = 0;
+    int numVisited = 0; // used in debugging
     int numPath = 0;
 
     public AgentFour(Grid maze, int i, int j) {
+        // for instantiating variables and finding the distances.
         this.maze = maze;
         startPos = maze.grid[i][j];
         currentPos = startPos;
@@ -26,12 +26,11 @@ public class AgentFour {
         for (int k = 0; k < maze.grid.length; k++)
             for (int l = 0; l < maze.grid.length; l++)
                 maze.grid[i][j].EstDistToGoal = (maze.grid.length - 1) * 2 - i - j;
-        // Math.pow((Math.pow((maze.grid.length - 1 - i), 2)
-        // + Math.pow((maze.grid.length - 1 - i), 2)), 0.5);
         findPath();
     }
 
     public void clearPreviousPath() {
+        // clearing all pointers on grid.
         for (int i = 0; i < maze.grid.length; i++) {
             for (int j = 0; j < maze.grid.length; j++) {
                 maze.grid[i][j].prev = null;
@@ -41,12 +40,12 @@ public class AgentFour {
     }
 
     public boolean isValid(int x, int y) {
+        // checking coordinate for grid bounds
         return x >= 0 && x < maze.grid.length && y >= 0 && y < maze.grid.length;
     }
 
     public boolean findPath() {
         clearPreviousPath();
-        HashSet<GridTile> closedSet = new HashSet<GridTile>();
         HashMap<GridTile, GridTile> prev = new HashMap<GridTile, GridTile>();
 
         PriorityQueue<GridTile> fringe = new PriorityQueue<GridTile>(11, new Comparator<GridTile>() {
@@ -58,11 +57,12 @@ public class AgentFour {
 
         for (int i = 0; i < maze.grid.length; i++) {
             for (int j = 0; j < maze.grid.length; j++) {
-                maze.grid[i][j].accumulatedCost = 99999;
+                maze.grid[i][j].accumulatedCost = 99999; // setting the initial cost of other nodes.
             }
         }
 
-        currentPos.accumulatedCost = 1;
+        // initial conditions to run the search
+        currentPos.accumulatedCost = 0;
         prev.put(currentPos, currentPos);
         fringe.add(currentPos);
 
@@ -75,15 +75,18 @@ public class AgentFour {
                 childX = v.x + neighborOffsets[i][0];
                 childY = v.y + neighborOffsets[i][1];
 
-                if (isValid(childX, childY)) {
+                if (isValid(childX, childY)) { // only checking for validity
                     if (v.accumulatedCost
                             + maze.grid[childX][childY].costToEnter < maze.grid[childX][childY].accumulatedCost
                                     + maze.grid[childX][childY].EstDistToGoal) {
+                        // only exploring elements which have a shorter cost through the current
+                        // element.
                         GridTile child = maze.grid[childX][childY];
                         child.accumulatedCost = v.accumulatedCost
                                 + maze.grid[childX][childY].costToEnter;
+                        // setting the new cost
                         fringe.add(child);
-                        numVisited++;
+                        numVisited++; // debugging purposes
                         child.prev = v;
                     }
                 }
@@ -91,10 +94,10 @@ public class AgentFour {
         }
         GridTile path = endPos;
 
-        while (path != currentPos) {
+        while (path != currentPos) { // checking for null nodes and creating path for stepAgent function
             if (path.prev == null) {
-                numPath = 0;
-                numVisited = 0;
+                numPath = 0; // debugging
+                numVisited = 0; // debugging
                 return false;
             }
             path.prev.next = path;
@@ -105,6 +108,7 @@ public class AgentFour {
     }
 
     public AgentState stepAgent() {
+        // same as agent 3
         AgentState state;
         if (currentPos.equals(endPos))
             state = AgentState.GOAL;
@@ -126,6 +130,7 @@ public class AgentFour {
     }
 
     public boolean pathBurning() {
+        // check to see if path is burning
         GridTile path = endPos;
         while (path != currentPos) {
             if (path.isBurning)
@@ -136,6 +141,7 @@ public class AgentFour {
     }
 
     public void printMaze() {
+        // maze printing for debugging purposes.
         HashSet<GridTile> fullPath = new HashSet<GridTile>();
 
         GridTile path = endPos;

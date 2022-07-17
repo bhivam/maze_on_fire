@@ -3,13 +3,14 @@ import java.util.*;
 public class AgentOne {
 
     final int[][] neighborOffsets = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
-
+    // make iterating children of node easy
     GridTile startPos;
     GridTile endPos;
     GridTile currentPos;
     Grid maze;
 
     public AgentOne(Grid maze, int i, int j) {
+        // creates minimum manhattan distance to goal
         this.maze = maze;
         startPos = maze.grid[i][j];
         currentPos = startPos;
@@ -17,14 +18,16 @@ public class AgentOne {
         for (int k = 0; k < maze.grid.length; k++)
             for (int l = 0; l < maze.grid.length; l++)
                 maze.grid[i][j].EstDistToGoal = (maze.grid.length - 1) * 2 - i - j;
-        findPath();
+        findPath(); // initial find path since it is guaranteed on first run
     }
 
     public boolean isValid(int x, int y) {
+        // checking coordinate bounds
         return x >= 0 && x < maze.grid.length && y >= 0 && y < maze.grid.length;
     }
 
     public void clearPreviousPath() {
+        // resets all pointers
         for (int i = 0; i < maze.grid.length; i++) {
             for (int j = 0; j < maze.grid.length; j++) {
                 maze.grid[i][j].prev = null;
@@ -34,6 +37,7 @@ public class AgentOne {
     }
 
     public boolean findPath() {
+        // Extremely similar implementation to Agent 3, refer to that
         clearPreviousPath();
         HashSet<GridTile> closedSet = new HashSet<GridTile>();
 
@@ -62,7 +66,7 @@ public class AgentOne {
                     childX = v.x + neighborOffsets[i][0];
                     childY = v.y + neighborOffsets[i][1];
 
-                    if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning
+                    if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning // only checks for real fire
                             && !maze.grid[childX][childY].blocked) {
                         if (d + 1 < maze.grid[childX][childY].dist) {
                             GridTile child = maze.grid[childX][childY];
@@ -90,7 +94,7 @@ public class AgentOne {
         return true;
     }
 
-    public AgentState stepAgent() {
+    public AgentState stepAgent() { // never runs find path again.
         AgentState state;
         if (currentPos.equals(endPos))
             state = AgentState.GOAL;
@@ -105,17 +109,8 @@ public class AgentOne {
         return state;
     }
 
-    public boolean pathBurning() {
-        GridTile path = endPos;
-        while (path != currentPos) {
-            if (path.isBurning)
-                return true;
-            path = path.prev;
-        }
-        return false;
-    }
-
     public void printMaze() {
+        // prints maze for debugging
         findPath();
         HashSet<GridTile> fullPath = new HashSet<GridTile>();
 

@@ -63,7 +63,7 @@ public class AgentTwo {
                 childY = v.y + neighborOffsets[i][1];
 
                 if (isValid(childX, childY) && !maze.grid[childX][childY].isBurning
-                        && !maze.grid[childX][childY].isGoingToBurn && !maze.grid[childX][childY].blocked
+                        && !maze.grid[childX][childY].blocked
                         && !closedSet.contains(maze.grid[childX][childY])) {
                     if (d + 1 + maze.grid[childX][childY].EstDistToGoal < maze.grid[childX][childY].dist
                             + maze.grid[childX][childY].EstDistToGoal) {
@@ -88,6 +88,7 @@ public class AgentTwo {
     }
 
     public AgentState stepAgent() {
+        // only stepping normal fire, otherwise same as Agent 3
         AgentState state;
         if (currentPos.equals(endPos))
             state = AgentState.GOAL;
@@ -96,7 +97,7 @@ public class AgentTwo {
         else
             state = AgentState.SAFE;
         if (pathBurning())
-            pathExists = findPath();
+            pathExists = findPath(); // replan if path is burning
         if (pathExists) {
             currentPos = currentPos.next;
             maze.stepFire();
@@ -108,6 +109,7 @@ public class AgentTwo {
     }
 
     public boolean pathBurning() {
+        // checking for burning path
         GridTile path = endPos;
         while (path != currentPos) {
             if (path.isBurning)
@@ -118,6 +120,7 @@ public class AgentTwo {
     }
 
     public void printMaze() {
+        // printing maze for debugging
         findPath();
         HashSet<GridTile> fullPath = new HashSet<GridTile>();
 
