@@ -1,19 +1,22 @@
 import java.util.Random;
 
 public class App {
+    // for testing and running the environment
     public static void main(String[] args) throws Exception {
-        double flammability = 0.15;
+        double flammability = 0.5;
         double percentBlocked = 0.3;
-        int numOfTrials = 1000;
+        int numOfTrials = 10000;
         int size = 51;
         for (int i = 0; i < 1; i++) {
             double start = System.currentTimeMillis();
             AgentData(flammability, percentBlocked, numOfTrials, size);
             double now = System.currentTimeMillis();
+            System.out.println("flammability: " + flammability);
             System.out.println((now - start) / 1000);
         }
     }
 
+    // for printing out the data and running the testing function
     public static void AgentData(double flammability, double percentBlocked, int numOfTrials, int size) {
         int[] AgentStats = testAgents(flammability, percentBlocked, numOfTrials, size);
         System.out.println("Agent One Success Rate: " + ((double) AgentStats[0]) /
@@ -26,6 +29,9 @@ public class App {
                 numOfTrials);
     }
 
+    // This sets up a new graph, makes three copies of it and assigns each agent a
+    // graph.
+    // The agents will return 1 for a success and 0 for a failure.
     public static int[] testAgents(double flammability, double percentBlocked, int numOfTrials, int mazeSize) {
         int goalTwo = 0;
         int goalOne = 0;
@@ -42,13 +48,17 @@ public class App {
             grid2 = new Grid(grid1);
             grid3 = new Grid(grid2);
             grid4 = new Grid(grid3);
-            // goalOne += runAgentOneTrial(grid1);
-            // goalTwo += runAgentTwoTrial(grid2);
+            goalOne += runAgentOneTrial(grid1);
+            goalTwo += runAgentTwoTrial(grid2);
             goalThree += runAgentThreeTrial(grid3);
-            // goalFour += runAgentFourTrial(grid4);
+            goalFour += runAgentFourTrial(grid4);
         }
         return new int[] { goalOne, goalTwo, goalThree, goalFour };
     }
+
+    // These functions are for driving the individual agents. There is no NO_PATH
+    // condition for agent one since you're guaranteed to find a path on the first
+    // try.
 
     public static int runAgentOneTrial(Grid grid) {
         AgentOne agent = new AgentOne(grid, 0, 0);

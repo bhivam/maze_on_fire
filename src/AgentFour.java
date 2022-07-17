@@ -45,7 +45,7 @@ public class AgentFour {
     }
 
     public boolean findPath() {
-        // clearPreviousPath();
+        clearPreviousPath();
         HashSet<GridTile> closedSet = new HashSet<GridTile>();
         HashMap<GridTile, GridTile> prev = new HashMap<GridTile, GridTile>();
 
